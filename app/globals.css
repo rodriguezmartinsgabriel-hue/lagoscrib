@@ -1,19 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy-950: #0B1121;
-  --color-navy-900: #0F1629;
-  --color-navy-800: #131B33;
-  --color-navy-700: #1A2442;
-  --color-navy-600: #243054;
-  --color-gold-400: #C8A66B;
-  --color-gold-500: #B8924F;
-  --color-gold-300: #D9BE8A;
-  --color-surface-50: #F0F0F5;
-  --color-surface-100: #E4E4EC;
-  --color-surface-200: #C8C8D4;
-  --color-surface-400: #8A92A6;
-  --color-surface-500: #6B7280;
+  /* Tema "Lightbox Analógico" (DESIGN.md v2 §cores).
+     Fonte única de verdade: THEME_PALETTE em lib/constants.ts.
+     Todos os pares texto/fundo ≥ 7:1 (AAA) — trava em
+     tests/unit/lightbox-contrast.test.ts. Hex fora daqui = erro de review. */
+  --color-paper: #FAF9F6;
+  --color-card: #FFFFFF;
+  --color-sand: #F3E9D7;
+  --color-ink: #1A1A1A;
+  --color-ink-soft: #4B5563;
+  --color-muted: #57534E;
+  --color-taxi: #F5C518;
+  --color-taxi-strong: #E0B400;
+  --color-pastel: #FDF096;
+  --color-peach: #FFE3D1;
+  --color-water: #DDF3F0;
+  --color-amberink: #5F4100;
+  --color-st-blue-bg: #DBEAFE;
+  --color-st-blue: #1E40AF;
+  --color-st-purple-bg: #F3E8FF;
+  --color-st-purple: #6B21A8;
+  --color-st-green-bg: #DCFCE7;
+  --color-st-green: #14532D;
+  --color-st-red-bg: #FEE2E2;
+  --color-st-red: #7F1D1D;
+  --color-line: #E7E2D8;
+  --color-inputbd: #78716C;
+  /* Exceção foto: scrim escuro SÓ sobre imagens (texto sempre paper por cima). */
+  --color-night: #0B1121;
 
   --font-sans: "Geist", system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
@@ -38,44 +53,88 @@
   to { opacity: 1; transform: scale(1); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer base {
   body {
-    background-color: var(--color-navy-950);
-    color: var(--color-surface-50);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
+  /* F3.7 Grain — textura fina feita em SVG (feTurbulence), útil por cima
+     de superfícies planas; pointer-events none e 4% de opacidade, sem
+     depender de imagem externa. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* F3.8 Tipografia display — títulos mais "tipo" (tracking + peso). */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+  }
+
+  h1,
+  h2 {
+    font-weight: 700;
+  }
+
   ::selection {
-    background-color: rgba(200, 166, 107, 0.25);
-    color: var(--color-surface-50);
+    background-color: color-mix(in srgb, var(--color-taxi) 45%, transparent);
+    color: var(--color-ink);
+  }
+
+  /* Anel de foco visível em ink (16.53:1 no paper — piso UI 3:1 folgado). */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
   }
 }
 
 @layer components {
   .card-apartment {
-    background: linear-gradient(145deg, rgba(19, 27, 51, 0.85) 0%, rgba(15, 22, 41, 0.95) 100%);
-    border: 1px solid rgba(200, 166, 107, 0.08);
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
     border-radius: 16px;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* F2.13: anima SÓ o que muda (border/transform/shadow) — sem `all`.
+       Grain/tipografia do corpo também não animam (F3.7). */
+    transition:
+      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    box-shadow: 0 1px 2px rgba(26, 26, 26, 0.05);
   }
 
   .card-apartment::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(200, 166, 107, 0.06) 0%, transparent 70%);
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, color-mix(in srgb, var(--color-taxi) 10%, transparent) 0%, transparent 70%);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s ease;
   }
 
   .card-apartment:hover {
-    border-color: rgba(200, 166, 107, 0.2);
+    border-color: color-mix(in srgb, var(--color-taxi) 65%, transparent);
     transform: translateY(-4px);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(200, 166, 107, 0.1);
+    box-shadow: 0 20px 40px -15px rgba(26, 26, 26, 0.18);
   }
 
   .card-apartment:hover::before {
@@ -83,17 +142,20 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--color-gold-400) 0%, var(--color-gold-500) 100%);
-    color: var(--color-navy-950);
+    background: linear-gradient(135deg, var(--color-taxi) 0%, var(--color-taxi-strong) 100%);
+    color: var(--color-ink);
     font-weight: 600;
     padding: 12px 24px;
-    border-radius: 12px;
-    transition: all 0.2s ease;
+    border-radius: 9999px;
+    /* F2.13: anima só o que muda no hover (transform + shadow). */
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px -8px rgba(200, 166, 107, 0.5);
+    box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--color-taxi) 70%, transparent);
   }
 
   .btn-primary:active {
@@ -101,18 +163,18 @@
   }
 
   .btn-secondary {
-    background: rgba(200, 166, 107, 0.1);
-    color: var(--color-gold-400);
+    background: var(--color-paper);
+    color: var(--color-ink);
     font-weight: 500;
     padding: 10px 20px;
-    border-radius: 10px;
-    border: 1px solid rgba(200, 166, 107, 0.2);
-    transition: all 0.2s ease;
+    border-radius: 9999px;
+    border: 1px solid var(--color-inputbd);
+    /* F2.13: no hover só o border-color muda. */
+    transition: border-color 0.2s ease;
   }
 
   .btn-secondary:hover {
-    background: rgba(200, 166, 107, 0.15);
-    border-color: rgba(200, 166, 107, 0.35);
+    border-color: var(--color-ink);
   }
 
   .status-badge {
@@ -125,73 +187,130 @@
     font-weight: 600;
     letter-spacing: 0.025em;
     text-transform: uppercase;
-    transition: all 0.2s ease;
+    /* F2.13: status muda cor de fundo/texto; badge não translada. */
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
+  /* Badges pastel + texto escuro calibrado (todos ≥ 7:1 — ver THEME_CONTRAST_TEXT).
+     Estado nunca só por cor: label textual + ícone onde há ação. */
   .status-novo {
-    background: rgba(138, 146, 166, 0.15);
-    color: var(--color-surface-400);
+    background: var(--color-sand);
+    color: var(--color-ink);
   }
 
   .status-agendado {
-    background: rgba(59, 130, 246, 0.15);
-    color: #60A5FA;
+    background: var(--color-st-blue-bg);
+    color: var(--color-st-blue);
   }
 
   .status-feita {
-    background: rgba(168, 85, 247, 0.15);
-    color: #C084FC;
+    background: var(--color-st-purple-bg);
+    color: var(--color-st-purple);
   }
 
   .status-negociacao {
-    background: rgba(200, 166, 107, 0.15);
-    color: var(--color-gold-400);
+    background: var(--color-pastel);
+    color: var(--color-ink);
   }
 
   .status-aprovado {
-    background: rgba(34, 197, 94, 0.15);
-    color: #4ADE80;
+    background: var(--color-st-green-bg);
+    color: var(--color-st-green);
   }
 
   .status-recusado {
-    background: rgba(239, 68, 68, 0.15);
-    color: #F87171;
+    background: var(--color-st-red-bg);
+    color: var(--color-st-red);
   }
 
   .input-field {
-    background: rgba(19, 27, 51, 0.8);
-    border: 1px solid rgba(138, 146, 166, 0.2);
+    background: var(--color-card);
+    border: 1px solid var(--color-inputbd);
     border-radius: 12px;
     padding: 14px 16px;
-    color: var(--color-surface-50);
+    color: var(--color-ink);
     font-size: 15px;
-    transition: all 0.2s ease;
+    /* F2.13: foco muda border + box-shadow (nunca all). */
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
     width: 100%;
   }
 
   .input-field::placeholder {
-    color: var(--color-surface-500);
+    color: var(--color-muted);
   }
 
   .input-field:focus {
     outline: none;
-    border-color: var(--color-gold-400);
-    box-shadow: 0 0 0 3px rgba(200, 166, 107, 0.1);
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ink) 12%, transparent);
   }
 
   .tag-pill {
     display: inline-flex;
     align-items: center;
     padding: 4px 10px;
-    background: rgba(138, 146, 166, 0.1);
+    background: var(--color-sand);
     border-radius: 8px;
     font-size: 12px;
-    color: var(--color-surface-400);
+    color: var(--color-ink);
     font-weight: 500;
   }
 
+  /* Slider duplo de preço (leva kanban-tela-inteira-ui): trilho + 2 thumbs
+     nativos sobrepostos. Input sem pointer-events; SÓ o thumb captura
+     (técnica padrão de dual-range acessível — teclado nativo preservado). */
+  .price-slider-input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+
+  .price-slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: auto;
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    background: var(--color-taxi);
+    border: 2px solid var(--color-ink);
+    cursor: grab;
+  }
+
+  .price-slider-input::-moz-range-thumb {
+    pointer-events: auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background: var(--color-taxi);
+    border: 2px solid var(--color-ink);
+    cursor: grab;
+  }
+
+  .price-slider-input:focus-visible {
+    outline: none;
+  }
+
+  .price-slider-input:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--color-card), 0 0 0 5px var(--color-ink);
+  }
+
+  .price-slider-input:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px var(--color-card), 0 0 0 5px var(--color-ink);
+  }
+
   .detail-overlay {
-    background: rgba(11, 17, 33, 0.95);
+    background: color-mix(in srgb, var(--color-night) 60%, transparent);
     backdrop-filter: blur(12px);
   }
 }

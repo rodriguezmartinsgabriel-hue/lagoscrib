@@ -31,6 +31,19 @@ Status: PARCIAL — código entregue, build OK, site funcionando (localhost:3000
 ## Decisão
 Manter card `t_2c00831f` em `Review`. O código é funcional, o design está conforme a spec, mas a validação funcional completa (login, status, notas) exige execução interativa — que não foi feita devido ao timeout do subagente. Se o usuário aceita como MVP parcial, pode ser marcado `PARCIAL-DONE` com esta evidência.
 
+--- ATUALIZAÇÃO FORK feat/dados-reais (2026-09-22, Gabriel/OpenCode) ---
+
+Verificação interativa via Playwright (localhost:3000, trusted clicks), tudo verde:
+1. Login `guinness/curitiba2026` OK (dashboard "Olá, guinness", contadores 7 Total / 7 Novos).
+2. 7 cards reais (Zap, validados 22/09) renderizados; imagens locais `public/imoveis/*.webp`
+   (CDN do Zap retorna 403 hotlink — baixadas com Referer, magic bytes RIFF/WEBP conferidos).
+3. Modal abre no clique, mostra total correto (ex.: R$ 3.220 no Água Verde Raul Carneiro).
+4. Status "Visita agendada" persiste em localStorage; nota adicionada ("Notas (1)") persiste.
+5. Contato: botões tel/mailto/WhatsApp só renderizam com dado presente; "Ver anúncio original"
+   sempre presente (banco de links). Credenciais removidas do README (via `.env.local`).
+6. `tsc --noEmit` limpo, `npm run build` verde, único erro de console era favicon (corrigido com `app/icon.svg`).
+Evidência visual: `docs/evidencia-dashboard-7-reais.png`.
+
 --- ATUALIZAÇÃO QA (2026-09-22) ---
 
 Verificação interativa via curl (localhost:3000, HTTP 200, 14993 bytes):
@@ -125,3 +138,107 @@ Criado via `gh repo create lagoscrib --public`.
 Código local (`C:/AI/apartamentos-app/`) inicializado com `.git` e pushado (`git push -u origin master`).
 Build (`.next/`) ignorado pelo `.gitignore` implícito (não commitado — conforme boas práticas).
 Status: REPO PÚBLICO + DEPLOY VERCEL funcionando (`https://lagoscrib.vercel.app/`).
+
+--- LEVA DORES-CONSUMIDOR — DONE (2026-09-22) ---
+Branch feat/dores-consumidor: 48da29d (PR-1 dados-reais) + 3d03567 (F0) + 1adf609 (S001) + 28d5c88 (S002) + 6370bb2 (S003) + 01570c6 (S004) + ecd9211 (S005) + abef995 (S006). Nada pusherado ate o OK do Gabriel.
+Gates F7 (ordem, todos PASS): tsc + lint(0 err/0 warn) + 41 unit + build estatico + 6/6 e2e (smoke, galeria, antidores, persistencia, comparacao, venda).
+Perf: audit-photos PASS (12x10 fotos, maior imovel 591KB << 3,5MB; arquivos 11-120KB << 350KB); priority so na 1a, resto lazy; fill+aspect = zero CLS.
+Security quick: 0 dangerouslySetInnerHTML, 0 segredos em app/lib, .env.local ignorado e nunca commitado, localStorage try/catch + version 2 lendo v1 (provado em e2e/persistencia), wa.me via encodeURIComponent.
+Evidencia por story (test-evidence-review: todas ADEQUATE, nao so existentes): S001 pricing+s001-data; S002 audit+manifesto+s002-galeria; S003 gallery(10)+galeria.spec+screenshots; S004 antidores(7)+antidores.spec+persistencia.spec; S005 compare(8)+comparacao.spec; S006 transaction(5)+venda.spec.
+Regression: docs/regression-suite.md (fluxo aluguel intocado + novos fluxos, 100% verde); workers=1 (flake de imagem sob 4 workers = carga, nao bug).
+Changelog: corpo dos 2 PRs (interno) + README (player-facing).
+Proximo: push + PR-1 feat/dados-reais (48da29d) -> PR-2 feat/dores-consumidor -> upstream gnnss777/lagoscrib, merge em sequencia, CI monitorado. Travado ate OK do Gabriel.
+
+--- PRS ABERTOS (2026-09-22) ---
+PR-1: https://github.com/gnnss777/lagoscrib/pull/1 (feat/dados-reais -> master, MERGEABLE, sem CI no upstream).
+PR-2: https://github.com/gnnss777/lagoscrib/pull/2 (feat/dores-consumidor -> master, merge apos o #1).
+
+--- LEVA FILTROS-AVANCADOS — DONE (2026-09-22) ---
+Branch feat/filtros-avancados (base: feat/dores-consumidor local, PR-3 sequencial): 2033111 (S008) + a386e9a (S009) + acee308 (S012) + d87b95d (S010).
+Gates F4 (ordem, todos PASS): tsc + lint(0 err/0 warn) + 63 unit + build estatico + 9/9 e2e (smoke, galeria, antidores, persistencia, comparacao, venda, filtros x2, form). Zero erro de console em todos os specs.
+UX: spec docs/ux/filtros-avancados.md ux-review NEEDS_REVISION -> corrigida (teclado, labels, reduced-motion, asserts) -> APPROVED; 10 ACs numerados.
+TDD pegou 3 bugs reais: substring aceita-em-nao-aceita, nulo no topo do maior-preco, min-0 nos inputs novos (sugestao do review S010). Review independente: passed em S008/S009/S010.
+Persistencia: chave nova apartamentos-app-filters v1 c/ debounce 300ms (nunca toca apartamentos-app-state); Dashboard-local por decisao documentada (evita re-render global).
+Evidencia por story (todas ADEQUATE): S008 filters(22)+ADR-003; S009 FilterPanel+filtros.spec+screenshots; S012 metragem header+asserts; S010 form+form.spec+screenshot.
+Regression: docs/regression-suite.md estendido (fluxos antigos intactos + 9 novos).
+Changelog: corpo do PR-3 (interno) + README Novidades (player-facing).
+Proximo: push + PR-3 feat/filtros-avancados -> upstream gnnss777/lagoscrib (apos PR-1/PR-2), CI monitorado. Travado ate OK do Gabriel.
+
+--- PR-3 ABERTO (2026-09-22) ---
+PR-3: https://github.com/gnnss777/lagoscrib/pull/3 (feat/filtros-avancados -> master, merge apos #1/#2, MERGEABLE, sem CI no upstream).
+
+--- LEVA LIGHTBOX-ANALOGICO � DONE (2026-09-22) ---
+Branch feat/lightbox-analogico (base: feat/filtros-avancados local): rebrand completo dark navy+gold -> claro papel-creme + amarelo-taxi (DESIGN.md v1.0 -> v2.0).
+TDD RED->GREEN: tests/unit/lightbox-contrast.test.ts (4 testes) + lib/contrast.ts + THEME_PALETTE em lib/constants.ts (LL-006 estendido a design). Pisos: texto normal >= 7:1 (AAA), UI/borda >= 3:1, pares proibidos (branco-sobre-taxi) documentados e provados falhos.
+Gates (ordem, todos PASS): tsc + lint(0/0) + 67 unit (63 + 4 novos) + build estatico (tokens novos confirmados no CSS compilado, zero residuo navy/gold/surface) + 9/9 e2e. 2 specs atualizados por mudanca intencional (ring-gold-400 -> ring-ink em venda/persistencia); resto intacto, zero erro de console.
+Correcoes de contraste herdadas do dark: placeholder surface-500 (3.89:1, falhava AA) -> muted (7.25:1); foco em ink (taxi-sobre-creme = 1.55:1, proibido); kill-switch prefers-reduced-motion global em globals.css.
+Escopo: 9/9 componentes migrados (s� classes/tokens, zero mudan�a de estrutura); scrim night mantido S� sobre fotos; galeria interna do vault +2 entradas. Proximo: commit nesta branch (push/PR a criterio do Gabriel, apos merges #1/#2/#3).
+
+
+--- EXPANSAO-BASE-5-FONTES --- DONE (2026-09-22) ---
+Branch feat/expansao-base-imoveis (base: feat/auth-lgpd-seguranca). Base 12 -> 109 imoveis (57 aluguel + 52 venda), 62 bairros distintos, 10/10 Regionais cobertas (Matriz 18, Boa Vista 11, Fazendinha/Portao 8, Santa Felicidade 7, Pinheirinho 5, Boqueirao 4, Bairro Novo 3, Cajuru 3, CIC 2, Tatuquara 1). Todos os 8 combos (1/2/3/4+ qts x alugar/comprar) com 7+ imoveis.
+Coleta: 5 subagentes general SEQUENCIAIS (rate-limit matou paralelo na rodada passada) --- Zap 27, VivaReal 24, OLX 9, Apolar 21 (via API JSON oficial do SPA; browser desktop indisponivel), imobiliarias 17 (7 lojas: Sillos, Mafi, Cadena, JBA, Casa Ao Lado, Hapen, Confianza) = 98 brutas. Descartados com motivo: 60 (12 priori + 2 + 24 + 18 + 4) + 1 drop no merge (olx-capao-raso studio sem nenhuma URL de foto) = 97 integradas, 0 colisoes no dedup (chave endereco+area+quartos+aba, data/coleta/merge.py).
+Proveniencia versionada em data/coleta/*.json (fichas + descartados) + scripts (merge.py, download.py, generate.py, extrair.py, cobertura.py).
+Correcoes aplicadas no merge (registradas, sem inventar dado): quartos Apolar pelo descritivo (ahu-gabriela 1->2, fanny 1->2, merces 2->3, capiberibe 2->3); decimais arredondados com total recomposto; mafi-centro condominio estimado -> condoUnknown; 10 titulos Apolar realinhados (erro de transcricao, sanidade por bairro); 3 URLs de galeria restauradas (jba-atuba, confianza-centro-civico); capas VivaReal 404 (URLs assinadas expiradas) -> fallback 01.webp como capa (santa-candida, sao-lourenco); OLX 1-thumb -> image+photos=[capa].
+Imagens: ~956 webp locais (capa + ate 10), 67,7 MB totais em public/imoveis (padrao .webp do repo; PIL converteu jpg/png).
+Codigo: lib/neighborhoods.ts (10 Regionais oficiais verificadas na prefeitura/Wikipedia em 22/09/2026; alias Ecoville->Santa Felicidade e Cidade Industrial->CIC, nomes de mercado; Campo Comprido agrupado em SF sem dupla contagem) + Dashboard dropdown com optgroup por Regional (filtro segue igualdade exata; useMemo p/ React Compiler preserve-manual-memoization) + interface Apartment com vivaId/olxId/apolarId/codigoAnunciante + bounds recalibrados (RENT max 20k, SALE max 35M; aluguel total 1.152-19.300, venda 150k-30M) + verifiedAt nos 7 alugueis originais.
+Gates (ordem, todos PASS): typecheck + lint(0/0) + 90/90 unit (16 arquivos; s001 57/52, s002 originais-11/novos->=1, smoke 57, neighborhoods 4, expansao-base 7 novos) + build estatico (15 rotas). Proximo: push + PR p/ upstream (apos #1-#4) a criterio do Gabriel.
+
+
+--- KANBAN-PROSPECCAO --- DONE (2026-09-22) ---
+Branch feat/kanban-prospeccao (base: feat/expansao-base-imoveis 4cc65bd). Status-fragmentado vira board: Perfil ("Ola, {username}" = botao) com aba Prospecao (KanbanBoard, 6 colunas) + aba Configurar quadro. Mover em <=2 acoes sem lib de drag (botoes <-/-> + menu Mover... topo/fim + teclado ,/./</> estilo Trello, aria-live policial). Follow-up do corretor com selo "sem retorno xN" + alerta "N sem retorno ha 7+ dias" + filtro So sem retorno. Prospectar da busca em <=2 acoes (card + modal).
+Bugs fechados com regressao: B1 data preservada ao trocar status (null=limpar, undefined=preservar; modal inicializa da entrada salva); B2 pool unico lib/pool.ts (Dashboard e Kanban consomem a mesma funcao); B3 followUps no estado v3 + UI (privacidade ja anunciava); B5 index por coluna (moveCard reindexa so colunas tocadas); B6 aria-live + 2 pares novos na trava de contraste. B4 segue DEFERRED (sync nao ligado; so contrato: toSyncFollowUps passa 100% no syncPushSchema + teste de pull mapping). Descoberta: syncPushSchema rejeita urlOriginal:"" (.url() nao aceita vazia) -> campo omitido quando desconhecido.
+Estado v3 aditivo na mesma chave (migrateStoredState cobre v1/v2); colunas customizaveis em chave propria (renomear/reordenar/ocultar/reset, reload preserva); STATUS_LABELS/StatusType mudam p/ lib/kanban.ts com re-export no AppContext (zero quebra de importadores).
+Gates: typecheck + lint 0/0 (13 arquivos) + 107/107 unit (18 arquivos: kanban 13 novos + pool 4 novos) + build estatico + 4/4 e2e kanban (teclado+aria-live, prospectar 2 acoes, customizacao+reload+reset, filtro sem-retorno). Nota honesta: persistencia/smoke/filtros/venda falham no HEAD sem esta leva (Expected 7, Received 57 - staleness da expansao 5-fontes, 7->57 aluguel); prova por stash registrada. UX spec em docs/ux/kanban-prospeccao.md. Proximo: UAT do Gabriel (LL-017) + push/PR a criterio dele; write-back no vault pendente manual.
+
+
+--- KANBAN-TELA-INTEIRA-UI --- DONE (2026-09-22) ---
+Branch feat/kanban-prospeccao (base: 57ab697). Kanban sai do dialogo e vira view full-viewport (fixed inset-0, header proprio com voltar/engrenagem/fechar, data-testid kanban-view); Configurar quadro vira painel lateral (role complementary). Stats bar da home removida (memo stats + grid 6 cards); header ganha botao pill Prospecao (visivel no mobile) mantendo Ola. Preco vira slider duplo (PriceRangeSlider + lib/priceSlider.ts pura): linear aluguel 0-20k/400 passos, log venda 0-35M/380 passos piso 50k; mesmos campos priceMin/Max (schema intacto); thumbs nativos com aria-valuetext BRL + chips aria-live. Pills: btn-primary/btn-secondary globais + Mais filtros, tabs Alugar/Comprar, Prospectar, Comparar/Limpar, acoes do kanban, tabs do DetailModal (nenhum par novo de cor).
+Gates: typecheck + lint 0/0 (14 arquivos) + 113/113 unit (19 arquivos: priceSlider 6 novos) + build estatico + 6/6 e2e (kanban tela cheia 4/4 migrado + slider 2/2 novos). Nota honesta: filtros.spec teve seletores migrados p/ o slider (setRange via setter nativo, pos 76=3800/20=1000) e segue falhando SO em contagem (Expected 7, Received 57 — staleness da expansao, linha 36 antes do slider); persistencia/smoke/venda inalterados. Descoberta: Intl BRL usa NBSP (R$ 20.000) — asserts e2e com regex \s. UX spec atualizada (secoes [TELA-CHEIA]). Proximo: UAT do Gabriel (LL-017) + push/PR a criterio dele; write-back no vault pendente manual.
+
+--- POLIMENTO-UX-V2 --- DONE (2026-09-23) ---
+Branch feat/polimento-ux-v2 (base: d52e09c). F1 bugs+a11y → F2 consistencia → F3 hierarquia → F4 docs → F5 QA.
+F1: cardStaggerDelay(index, step=0.08, cap=12) pura em lib/motion.ts + MotionProvider (MotionConfig reducedMotion="user") no layout; DetailModal role=dialog/aria-modal/foco-no-painel+restaura-gatilho/scroll-lock/Esc; ProfileModal vira view (SEM role=dialog, com foco/scroll-lock); AddApartmentForm vira modal (role=dialog/Esc/foco-1º-campo/scroll-lock, placeholders intactos); scroll-lock via lib/useScrollLock.ts em Detail/Compare/ImageLightbox/Profile/AddForm.
+F2: formatBRL (@/lib/antiDores) em ApartmentCard+DetailModal (defs locais removidas); KanbanBoard 0 text-[11px] + preco font-mono + colunas bg-sand/shadow-sm; SelectField (label visivel AAA) aplicado nos 3 min-selects do FilterPanel (ids f-quartos/f-banheiros/f-vagas preservados); LoginPage Key→Buildings; DetailModal badges inativos sem opacity-60 (contraste); layout metadata completa; globals 0 transition:all (5 pontos per-property).
+F3: card minimo (foto+badge+preco+bairro+4 stats+Comparar; sem endereco/telefone/links/facilidades/Prospectar — Prospectar vive no DetailModal aba Status); header com pill Prospecção (aria-label "Abrir prospecção (kanban)") + Olá + Sair; countline detalhada só com filtro; grain body::before (feTurbulence 4%) + tipografia display (tracking/peso).
+F4: DESIGN.md (max-w-7xl, raios 8/12/16 + kanban full-viewport, Card minimo, Dialog/AddApartmentForm modal, MotionConfig+stagger-cap) + kanban-prospeccao.md (Prospectar só no modal) + galeria-e-confianca.md (card minimo).
+F5: kanban.spec teste 1 migrado (card → DetailModal aba Status → Prospectar → view 100vw); slider.spec já dinâmico (sem change); e2e/polimento.spec.ts novo (card-mínimo+Comparar-isolado, stagger-converge, foco/Esc-restaura-gatilho).
+Gates: typecheck 0 erros (2x) + unit 118/118 (motion 5/5 após fix de contrato: cap omitido = sem cap, call-site passa cap 12 explícito) + lint escopado 0/0 nos 17 arquivos da leva (full-repo eslint trava >10min neste env — documentado) + build OK (compilado 6.6min Turbopack, 15/15 páginas) + e2e 9 passed/9 failed workers=1: passam kanban 4/4 + polimento 3/3 + slider 2/2; as 9 falhas são TODAS staleness pré-existente FORA de escopo (Expected 7, Received 57 — pool expansão-base): antidores.spec.ts:22, comparacao.spec.ts:20, filtros.spec.ts:36 (helper login, testes :39 e :120), form.spec.ts:14, galeria.spec.ts:21, persistencia.spec.ts:38, smoke.spec.ts:17, venda.spec.ts:23. SELECTORES/ACs preservados: data-testid kanban-view, .card-apartment, formatBRL, f-quartos/f-banheiros/f-vagas, placeholders form.spec, Entrar/Digite seu usuário.
+Desvios registrados: selects do Dashboard (dash-bairro/status/sort) mantidos com layout custom (ícones+optgroups) — já com labels, incompatíveis com wrapper genérico sem quebrar e2e.
+Proximo: push + PR-6 feat/polimento-ux-v2 → upstream (após #1-#5), merge a critério do guinnes.
+
+--- KANBAN-ESTATICO-SEM-SCROLL --- DONE (2026-09-23) ---
+Branch feat/polimento-ux-v2 (mesmo PR-6, commit novo sobre 34b9089 — decisão do Gabriel).
+Direção A + miniatura 40px + contador "+N restantes" (decisões travadas em plan-mode).
+Matemática honesta que comandou o desenho: pool 109 (57 aluguel + 52 venda); default statuses []
+→ tudo cai em "Não visitado" (e2e mediu 57, trava 7, rodapé "+50 restantes" exato).
+Orçamento 768p: pílula ≈52–60px + gap 6px → 7 ≈ 470px; + header/rodapé ≈ 590px ≤ ~592px úteis.
+KANBAN_VISIBLE_CAP = 7 (lib/constants.ts, fonte única LL-006) + splitColumnOverflow pura/imutável (lib/kanban.ts).
+Card vira pílula: miniatura 40px + título/bairro 1 linha + preço formatBRL mono + FollowUpSeal
+(texto "sem retorno ×N"/"retornou"/último contato — mesmos pares de cor travados, zero par novo).
+Sem botões visíveis: mover/contato no menu do card (menuitem Contatei/Retornou ✓ + destinos topo/fim;
+abrir + escolher = ≤2 ações, AC-1) + teclado ,/./</>/Enter/Esc (AC-2).
+Board: flex h-full + linha flex-1 items-stretch + colunas flex-1 min-w-0 overflow-hidden (lg+,
+zero scroll de página e de coluna); <lg scroll de fallback documentado. Contagens/aria-labels
+sempre totais. "+N" abre dialog jump-list (role=dialog/aria-modal/foco/restaura-gatilho/scroll-lock;
+Esc fecha SÓ o dialog — guarda no Esc da view; clique abre o detalhe).
+SUPERSEDE na spec docs/ux/kanban-prospeccao.md: AC-U2 (scroll próprio) e AC-3 (foto h-28);
+novos AC-U9 (estático) + AC-U10 (trava com unit). DESIGN.md: linha KanbanCard + largura.
+Gates: typecheck 0 + lint escopado 0/0 (6 arquivos) + unit 121/121 (kanban 16/16, 3 novos split)
++ build 15/15 + e2e kanban 5/5 (4 antigos intactos + estatico novo).
+Falha honesta no caminho: click de mouse no "+50" interceptado pelo <nextjs-portal> do dev-overlay
+(cobre o rodapé da 1ª coluna em dev) → teste usa foco + Enter (caminho de teclado real, prova AC-2).
+ACs/seletores preservados: kanban-view, region por coluna, formatBRL, Esc/foco, Só sem retorno/
+Mostrar todos, selo "sem retorno ×2", alerta "7+ dias", aria-live. Desvio intencional: botões
+←/→ e Contatei/Retornou visíveis saem do card → vivem no menu (≤2 ações, documentado na spec).
+Backdrop do dialog em bg-night/60 (padrão dos modais, zero cor nova).
+Suite e2e completa: (resultado abaixo, em append separado).
+
+--- KANBAN-ESTATICO SUITE COMPLETA (2026-09-23) ---
+19 testes, workers=1: 10 passed / 9 failed.
+Passam: kanban 5/5 (4 antigos + estatico novo) + polimento 3/3 + slider 2/2.
+As 9 falhas são AS MESMAS staleness pré-existentes da leva polimento-ux-v2
+(Expected 7, Received 57 — pool expansão-base, fora de escopo, NÃO consertar):
+antidores.spec.ts:22, comparacao.spec.ts:20, filtros.spec.ts:36 (helper login, :39 e :120),
+form.spec.ts:14, galeria.spec.ts:21, persistencia.spec.ts:38, smoke.spec.ts:17, venda.spec.ts:23.
+Zero regressão da leva (escopo 9/9 → 10/10).

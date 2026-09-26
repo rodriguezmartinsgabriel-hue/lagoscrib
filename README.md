@@ -16,7 +16,7 @@ App web premium/minimalista para gerenciar apartamentos para alugar em Curitiba.
 ## Como Executar
 
 ```bash
-cd C:/AI/apartamentos-app
+cd D:/projetos/lagoscrib
 npm install
 npm run dev
 ```
@@ -25,10 +25,8 @@ Acesse: **http://localhost:3000**
 
 ## Credenciais de Login
 
-| Usuário | Senha |
-|---------|-------|
-| guinness | curitiba2026 |
-| admin | admin123 |
+Configuradas via ambiente — copie `.env.example` para `.env.local` (nunca commitado).
+Padrões de dev local: usuário `guinness` / admin `admin`.
 
 ## Funcionalidades (MVP)
 
@@ -77,12 +75,31 @@ lib/
 | `npm run build` | Build de produção |
 | `npm start` | Servidor de produção |
 
-## Paleta de Cores
+## Paleta de Cores (tema "Lightbox Analógico" — DESIGN.md v2.0)
 
 | Cor | Hex | Uso |
 |-----|-----|-----|
-| Navy 950 | #0B1121 | Fundo principal |
-| Navy 900 | #0F1629 | Cards |
-| Gold 400 | #C8A66B | Acentos e destaques |
-| Surface 50 | #F0F0F5 | Texto primário |
-| Surface 400 | #8A92A6 | Texto secundário |
+| Paper | #FAF9F6 | Fundo principal (papel creme) |
+| Card | #FFFFFF | Cards, modais, inputs |
+| Ink | #1A1A1A | Texto principal |
+| Taxi | #F5C518 | Acentos e destaques (CTA, seleção, logo) |
+| Ink-soft | #4B5563 | Texto secundário |
+| Muted | #57534E | Placeholders e labels |
+
+Contraste AAA em todo texto (≥ 7:1) — trava automatizada em `tests/unit/lightbox-contrast.test.ts`.
+
+## Novidades (leva dores-consumidor — 22/09/2026)
+
+- **Galeria completa**: todo imóvel com 11 fotos reais do anúncio, navegáveis com zoom.
+- **Custo total de verdade**: aluguel + condomínio + IPTU somados, com estimativas de entrada e mudança (sempre rotuladas como estimativa).
+- **Compra e aluguel**: aba Alugar | Comprar com 5 imóveis à venda de Curitiba.
+- **Confiança**: selo de verificação com data e origem, botão Confirmar disponibilidade e aviso anti-golpe em todo contato.
+- **Visita e comparação**: checklist de visita exportável (copiar/WhatsApp), planta quando divulgada e comparação lado a lado de até 4 imóveis.
+
+- **Filtros avancados**: busque por quartos, banheiros, vagas, faixa de preco, area, condominio, mobiliado, pets e facilidades — com ordenacao (menor preco, maior area, mais recentes) e filtros salvos ao recarregar.
+- **Comparativo com metragem**: cada coluna mostra titulo + m2 + preco.
+
+## Novidades (leva lightbox-analogico — 22/09/2026)
+
+- **Tema claro**: fundo papel creme com destaques em amarelo táxi — leitura mais confortável e cara de portal imobiliário.
+- **Acessibilidade AAA**: todo texto com contraste ≥ 7:1 (antes, alguns textos secundários falhavam até o mínimo); foco visível em tinta preta em todo botão e campo.
